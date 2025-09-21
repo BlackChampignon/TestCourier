@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступные заказы</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .nav-links a { color: #2196F3; text-decoration: none; margin: 0 10px; }
+        .order-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .order-card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: white; }
+        .btn { padding: 10px 20px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; }
+        .btn:hover { background: #45a049; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Доступные заказы</h1>
+            <div class="nav-links">
+                <a href="/courier/dashboard/">← Назад к панели</a>
+                <a href="/logout/">Выйти</a>
+            </div>
+        </div>
+
+        {% if available_orders %}
+            <div class="order-grid">
+                {% for order in available_orders %}
+                <div class="order-card">
+                    <h3>Заказ #{{ order.id }}</h3>
+                    <p><strong>Магазин:</strong> {{ order.store.name }}</p>
+                    <p><strong>Дата создания:</strong> {{ order.time_created|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Сумма заказа:</strong> {{ order.get_total_amount }} ₽</p>
+                    <p><strong>Статус:</strong> Ожидает курьера</p>
+
+                    <form action="{% url 'take_order' order.id %}" method="post" style="margin-top: 15px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn">Взять заказ</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h2>🎉 Все заказы распределены!</h2>
+                <p>В данный момент нет доступных заказов.</p>
+                <a href="/courier/dashboard/" class="btn">← Вернуться к панели</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

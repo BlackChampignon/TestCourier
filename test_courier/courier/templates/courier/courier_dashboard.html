@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель курьера</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            color: #2196F3;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 8px 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #2196F3;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .orders-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: white;
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-success {
+            background: #4CAF50;
+        }
+        .btn-warning {
+            background: #FF9800;
+        }
+        .status-delivered {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .status-pending {
+            color: #FF9800;
+            font-weight: bold;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Панель курьера - {{ user.name }}</h1>
+            <div class="nav-links">
+                <a href="/available_orders/">Доступные заказы</a>
+                <a href="/deliveries/">Все доставки</a>
+                <a href="/logout/">Выйти</a>
+            </div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ active_orders.count }}</div>
+                <div>Активные доставки</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ completed_orders.count }}</div>
+                <div>Завершенные доставки</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ available_count }}</div>
+                <div>Доступные заказы</div>
+            </div>
+        </div>
+
+        <div class="orders-grid">
+            <div class="section">
+                <h2>Мои активные доставки</h2>
+                {% if active_orders %}
+                    {% for order in active_orders %}
+                    <div class="order-card">
+                        <h3>Заказ #{{ order.id }}</h3>
+                        <p><strong>Магазин:</strong> {{ order.store.name }}</p>
+                        <p><strong>Дата:</strong> {{ order.time_created|date:"d.m.Y H:i" }}</p>
+                        <p><strong>Сумма:</strong> {{ order.get_total_amount }} ₽</p>
+                        <p><strong>Статус:</strong> <span class="status-pending">В процессе</span></p>
+
+                        <div style="margin-top: 15px;">
+                            <a href="{% url 'order_detail' order.id %}" class="btn">Детали заказа</a>
+                            <form action="{% url 'complete_order' order.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success">Завершить доставку</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>Нет активных доставок</p>
+                        <a href="/available_orders/" class="btn">Взять заказ</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <h2>Завершенные доставки</h2>
+                {% if completed_orders %}
+                    {% for order in completed_orders %}
+                    <div class="order-card">
+                        <h3>Заказ #{{ order.id }}</h3>
+                        <p><strong>Магазин:</strong> {{ order.store.name }}</p>
+                        <p><strong>Доставлен:</strong> {{ order.time_delivered|date:"d.m.Y H:i" }}</p>
+                        <p><strong>Сумма:</strong> {{ order.get_total_amount }} ₽</p>
+                        <p><strong>Статус:</strong> <span class="status-delivered">Доставлен</span></p>
+
+                        <div style="margin-top: 15px;">
+                            <a href="{% url 'order_detail' order.id %}" class="btn">Детали заказа</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>Нет завершенных доставок</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

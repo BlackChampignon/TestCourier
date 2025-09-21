@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание заказа</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .nav-links a { color: #2196F3; text-decoration: none; margin: 0 10px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        .cart { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 30px; }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .btn { padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-danger { background: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Создание заказа - {{ user.name }}</h1>
+            <div class="nav-links">
+                <a href="/store/dashboard/">🏪 Панель</a>
+                <a href="/store/orders/">📋 Мои заказы</a>
+                <a href="/logout/">🚪 Выйти</a>
+            </div>
+        </div>
+
+        <h2>Доступные товары</h2>
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <h3>{{ product.name }}</h3>
+                <p>Цена: {{ product.price }} ₽</p>
+                <p>В наличии: {{ product.quantity }} шт.</p>
+                <form class="add-to-cart-form">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.quantity }}" class="form-control">
+                    <button type="submit" class="btn">Добавить в корзину</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cart">
+            <h2>🛒 Корзина заказа</h2>
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="cart-item">
+                    <span>{{ item.product_name }} - {{ item.quantity }} шт.</span>
+                    <span>{{ item.total }} ₽</span>
+                    <a href="{% url 'remove_from_cart' item.product_id %}" class="btn btn-danger">❌ Удалить</a>
+                </div>
+                {% endfor %}
+
+                <div style="font-weight: bold; margin: 15px 0; padding: 10px; background: #e3f2fd; border-radius: 5px;">
+                    Общая сумма: {{ cart_total }} ₽
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">✅ Оформить заказ</button>
+                </form>
+            {% else %}
+                <p>Корзина пуста</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.add-to-cart-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const response = await fetch('/add_to_cart/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('Товар добавлен в корзину!');
+                    location.reload();
+                } else {
+                    alert('Ошибка: ' + data.error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

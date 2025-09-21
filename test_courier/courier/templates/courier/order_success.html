@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заказ оформлен</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; text-align: center; }
+        .container { max-width: 600px; margin: 100px auto; background: white; padding: 40px; border-radius: 10px; }
+        .success-icon { font-size: 60px; color: #4CAF50; margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 12px 24px; background: #2196F3; color: white; text-decoration: none; border-radius: 5px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>Заказ успешно оформлен!</h1>
+        <p>Номер вашего заказа: <strong>#{{ delivery.id }}</strong></p>
+        <p>Общая сумма:<strong> {{ delivery.get_total_amount }} ₽</strong></p>
+        <p>Заказ будет доставлен в ближайшее время</p>
+
+        <div style="margin-top: 30px;">
+            <a href="/create_order/" class="btn">🛒 Создать новый заказ</a>
+            <a href="/store/orders/" class="btn">📋 Мои заказы</a>
+            <a href="/store/dashboard/" class="btn">🏪 В панель управления</a>
+        </div>
+    </div>
+</body>
+</html>

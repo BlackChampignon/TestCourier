@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель магазина</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .welcome { color: #333; }
+        .nav-links a { color: #2196F3; text-decoration: none; margin: 0 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="welcome">Панель магазина: {{ user.name }}</h1>
+            <div class="nav-links">
+                <a href="/products/">Продукты</a>
+                <a href="/deliveries/">Доставки</a>
+                <a href="/create_order/">Создать заказ</a>
+                <a href="/logout/">Выйти</a>
+            </div>
+        </div>
+
+        <h2>Добро пожаловать в панель управления магазином!</h2>
+        <p>Здесь вы можете управлять своими заказами и отслеживать доставки.</p>
+    </div>
+</body>
+</html>
